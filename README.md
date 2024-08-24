@@ -1,4 +1,4 @@
-**Influencer Engagement & Sponsorship Platform**
+**Influencer Engagement & Sponsorship Platform- AdFusion**
 
 A web-based platform connecting sponsors with influencers, enabling seamless ad campaign management and monetization.
 
