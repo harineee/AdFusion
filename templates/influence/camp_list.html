@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Campaign List - AdFusion</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+    <style>
+        body {
+            background-color: #000000;
+            color: #f5f5f5;
+            font-family: 'Arial', sans-serif;
+        }
+
+        h1 {
+            color: #DFBD69;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .form-control,
+        input[type="text"],
+        input[type="email"],
+        input[type="number"],
+        input[type="password"],
+        textarea,
+        select {
+            background-color: #1c1c1c;
+            color: #f5f5f5;
+            border: 1px solid #444;
+            border-radius: 30px;
+            padding: 10px 15px;
+        }
+
+        .form-control::placeholder,
+        input[type="text"]::placeholder,
+        input[type="email"]::placeholder,
+        input[type="number"]::placeholder,
+        input[type="password"]::placeholder,
+        textarea::placeholder {
+            color: #888;
+        }
+
+        .form-control:focus,
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="number"]:focus,
+        input[type="password"]:focus,
+        textarea:focus,
+        select:focus {
+            background-color: #333;
+            border-color: #DFBD69;
+            color: #f5f5f5;
+            box-shadow: 0 0 10px #DFBD69;
+        }
+
+        .btn-primary,
+        .btn-info {
+            background: linear-gradient(90deg, #DFBD69, #926F34);
+            border: none;
+            border-radius: 30px;
+            font-size: 18px;
+            font-weight: bold;
+            text-transform: uppercase;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            margin-bottom: 10px;
+        }
+
+        .btn-primary:hover,
+        .btn-info:hover {
+            box-shadow: 0 0 15px rgba(223, 189, 105, 0.6);
+        }
+
+        .table {
+            background-color: #1c1c1c;
+            color: #f5f5f5;
+            border-radius: 20px;
+            border: 1px solid #444;
+        }
+
+        .table th {
+            color: #DFBD69;
+        }
+
+        .table td {
+            color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin-top: 50px;
+        }
+    </style>
+</head>
+
+<body>
+    {% include 'influence/header.html' %}
+    <div class="container">
+        <h1>Campaign List</h1>
+        <div class="mb-3">
+            <form method="GET" action="{{ url_for('list_campaign') }}">
+                <div class="form-group">
+                    <label for="niche">Filter by Niche</label>
+                    <select class="form-control" id="niche" name="niche" onchange="this.form.submit()">
+                        <option value="all">All Niches</option>
+                        {% for niche in niches %}
+                        <option value="{{ niche }}" {% if niche == selected_niche %}selected{% endif %}>{{ niche }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="search_term">Search</label>
+                    <input type="text" class="form-control" id="search_term" name="search_term" value="{{ search_term }}" placeholder="Search...">
+                </div>
+                <input type="hidden" name="sort_by" value="{{ sort_by }}">
+                <button type="submit" class="btn btn-primary">Search</button>
+            </form>
+        </div>
+        <div class="mb-3">
+            <a href="{{ url_for('list_campaign', sort_by='asc', niche=selected_niche, search_term=search_term) }}" class="btn btn-primary">Sort by Budget (Ascending)</a>
+            <a href="{{ url_for('list_campaign', sort_by='desc', niche=selected_niche, search_term=search_term) }}" class="btn btn-primary">Sort by Budget (Descending)</a>
+        </div>
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Duration</th>
+                    <th>Niche</th>
+                    <th>Budget</th>
+                    <th>Goals</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for campaign in campaign %}
+                <tr>
+                    <td>{{ campaign.name }}</td>
+                    <td>{{ campaign.description }}</td>
+                    <td>{{ campaign.start_date }} to {{ campaign.end_date }}</td>
+                    <td>{{ campaign.niche }}</td>
+                    <td>{{ campaign.budget }}</td>
+                    <td>{{ campaign.goals }}</td>
+                    <td>
+                        <a href="{{ url_for('adrequest', campaign_id=campaign.id) }}" class="btn btn-info">Request</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <script>
+        window.addEventListener('DOMContentLoaded', (event) => {
+            // Handling flash messages with 'danger' category
+            let errorMessage = '{{ get_flashed_messages(category_filter=["danger"])[0] if get_flashed_messages(category_filter=["danger"]) else "" }}';
+            if (errorMessage) {
+                alert(errorMessage);
+            }
+    
+            // Handling flash messages with 'success' category
+            let successMessage = '{{ get_flashed_messages(category_filter=["success"])[0] if get_flashed_messages(category_filter=["success"]) else "" }}';
+            if (successMessage) {
+                alert(successMessage);
+            }
+
+            let warningMessage = '{{ get_flashed_messages(category_filter=["warning"])[0] if get_flashed_messages(category_filter=["warning"]) else "" }}';
+                if (warningMessage) {
+                    alert(warningMessage);
+                }
+        });
+    </script>
+</body>
+
+</html>

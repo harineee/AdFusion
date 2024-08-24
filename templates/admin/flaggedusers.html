@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flagged Influencers - AdFusion</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #000000;
+            color: #f5f5f5;
+            font-family: 'Arial', sans-serif;
+        }
+
+        .container h1 {
+            color: #DFBD69;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .form-control {
+            background-color: #1c1c1c;
+            color: #f5f5f5;
+            border: 1px solid #444;
+            border-radius: 30px;
+            padding: 10px 15px;
+        }
+
+        .form-control:focus {
+            background-color: #333;
+            border-color: #DFBD69;
+            color: #f5f5f5;
+            box-shadow: 0 0 10px #DFBD69;
+        }
+
+        .table {
+            background-color: #1c1c1c;
+            color: #f5f5f5;
+            border-radius: 20px;
+            border: 1px solid #444;
+        }
+
+        .table th {
+            color: #DFBD69;
+            font-weight: bold;
+        }
+
+        .table td {
+            color: #f5f5f5;
+        }
+
+        .btn-success {
+            background: linear-gradient(90deg, #DFBD69, #926F34);
+            border: none;
+            border-radius: 30px;
+            font-size: 18px;
+            font-weight: bold;
+            text-transform: uppercase;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            margin-right: 10px;
+            color: #000;
+        }
+
+        .btn-success:hover {
+            box-shadow: 0 0 15px rgba(223, 189, 105, 0.6);
+        }
+    </style>
+</head>
+
+<body>
+    {% include 'admin/header.html' %}
+    <div class="container mt-5">
+        <h1>Flagged Influencers</h1>
+        <form method="GET" action="{{ url_for('flagged_users') }}" class="form-inline mb-3">
+            <input type="text" name="search" class="form-control mr-sm-2" placeholder="Search by name" value="{{ request.args.get('search', '') }}">
+            <button type="submit" class="btn btn-primary">Search</button>
+        </form>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Category</th>
+                    <th>Niche</th>
+                    <th>Reach</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for influencer in influencers %}
+                <tr>
+                    <td>{{ influencer.user.username }}</td>
+                    <td>{{ influencer.category }}</td>
+                    <td>{{ influencer.niche }}</td>
+                    <td>{{ influencer.reach }}</td>
+                    <td>
+                        <a href="{{ url_for('reinstate_influencer', influencer_id=influencer.id) }}" class="btn btn-success">Reinstate</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <script>
+        window.addEventListener('DOMContentLoaded', (event) => {
+            // Handling flash messages with 'danger' category
+            let errorMessage = '{{ get_flashed_messages(category_filter=["danger"])[0] if get_flashed_messages(category_filter=["danger"]) else "" }}';
+            if (errorMessage) {
+                alert(errorMessage);
+            }
+    
+            // Handling flash messages with 'success' category
+            let successMessage = '{{ get_flashed_messages(category_filter=["success"])[0] if get_flashed_messages(category_filter=["success"]) else "" }}';
+            if (successMessage) {
+                alert(successMessage);
+            }
+        });
+    </script>
+</body>
+
+</html>

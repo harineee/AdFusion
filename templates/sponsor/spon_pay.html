@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Sponsor Payments - AdFusion</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #000000;
+            color: #DFBD69; /* Change text color to gold */
+            font-family: 'Arial', sans-serif;
+        }
+
+        .container h1 {
+            color: #DFBD69;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .table {
+            background-color: #1c1c1c;
+            border: 1px solid #444;
+            color: #DFBD69; /* Change text color to gold */
+        }
+
+        .table th {
+            color: #DFBD69; /* Change table header text color to gold */
+        }
+
+        .table td {
+            color: #DFBD69; /* Change table data text color to gold */
+        }
+
+        .btn-success {
+            background: linear-gradient(90deg, #DFBD69, #926F34);
+            border: none;
+            border-radius: 30px;
+            font-size: 18px;
+            font-weight: bold;
+            text-transform: uppercase;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .btn-success:hover {
+            box-shadow: 0 0 15px rgba(223, 189, 105, 0.6);
+        }
+
+        .container {
+            max-width: 1000px;
+            margin-top: 50px;
+        }
+
+        p {
+            color: #DFBD69; /* Change paragraph text color to gold */
+        }
+    </style>
+</head>
+
+<body>
+    {% include 'sponsor/header.html' %}
+    <div class="container mt-5">
+        <h1>Payments</h1>
+        {% if payments %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Campaign</th>
+                    <th scope="col">Influencer</th>
+                    <th scope="col">Amount</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for payment in payments %}
+                <tr>
+                    <td>{{ payment.campaign.name }}</td>
+                    <td>{{ payment.influencer.user.username }}</td>
+                    <td>{{ payment.amount }}</td>
+                    <td>{{ payment.status | capitalize }}</td>
+                    <td>
+                        {% if payment.status == 'pending' %}
+                        <form action="{{ url_for('pay_payment', payment_id=payment.id) }}" method="post" class="d-inline">
+                            <button type="submit" class="btn btn-success">Pay</button>
+                        </form>
+                        {% else %}
+                        <span>Paid</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>No payments to display.</p>
+        {% endif %}
+    </div>
+    <script>
+        window.addEventListener('DOMContentLoaded', (event) => {
+            // Handling flash messages with 'danger' category
+            let errorMessage = '{{ get_flashed_messages(category_filter=["danger"])[0] if get_flashed_messages(category_filter=["danger"]) else "" }}';
+            if (errorMessage) {
+                alert(errorMessage);
+            }
+    
+            // Handling flash messages with 'success' category
+            let successMessage = '{{ get_flashed_messages(category_filter=["success"])[0] if get_flashed_messages(category_filter=["success"]) else "" }}';
+            if (successMessage) {
+                alert(successMessage);
+            }
+
+            let infoMessage = '{{ get_flashed_messages(category_filter=["info"])[0] if get_flashed_messages(category_filter=["info"]) else "" }}';
+            if (infoMessage) {
+                alert(infoMessage);
+            }
+
+            let errorpaymentMessage = '{{ get_flashed_messages(category_filter=["error"])[0] if get_flashed_messages(category_filter=["error"]) else "" }}';
+            if (errorpaymentMessage) {
+                alert(errorpaymentMessage);
+            }
+        });
+    </script>
+</body>
+
+</html>

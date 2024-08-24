@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard - AdFusion</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Custom CSS -->
+    <style>
+        body {
+            background-color: #000000; /* Set the background to black */
+            color: #000000;
+            font-family: 'Arial', sans-serif;
+            margin: 0; /* Remove default body margin */
+            padding: 0; /* Remove default body padding */
+        }
+
+        .title-container {    
+            text-align: center;
+            padding: 20px;
+            color: #DFBD69; /* Gold color for text */
+            background-color: #1c1c1c; /* Dark grey background */
+            border-radius: 20px;
+            margin: 0 auto 30px auto; /* Center align the container with no side margins */
+            max-width: 90%; /* Adjust width to make sure there’s no side gap */
+            box-shadow: 0 0 20px rgba(223, 189, 105, 0.5); /* Subtle gold shadow */
+        }
+
+        .title {
+            font-size: 48px;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+
+        .content-container {    
+            background-color: #1c1c1c; /* Dark grey background */
+            padding: 40px;
+            margin: 0 auto 20px auto; /* Center align the container with no side margins */
+            max-width: 90%; /* Adjust width to make sure there’s no side gap */
+            border-radius: 20px;
+            box-shadow: 0 0 20px rgba(223, 189, 105, 0.5); /* Subtle gold shadow */
+        }
+
+        .card {
+            background-color: #1c1c1c; /* Dark grey background */
+            border: 1px solid #DFBD69; /* Gold border */
+            border-radius: 20px;
+            box-shadow: 0 0 20px rgba(223, 189, 105, 0.3); /* Subtle gold shadow */
+            padding: 40px;
+            margin-bottom: 20px;
+            color: #000000; /* Ensure text is readable */
+}
+
+        
+
+        .card-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #DFBD69; /* Use the gold color for titles */
+        }
+
+        .nav-item {
+            margin-bottom: 10px;
+            color: #000000;
+        }
+
+        .nav-item strong {
+            color: #DFBD69; /* Make the labels gold */
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, #DFBD69, #926F34);
+            border: none;
+            border-radius: 30px;
+            padding: 10px 20px;
+            font-size: 18px;
+            font-weight: bold;
+            text-transform: uppercase;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            color: #000000;
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 0 15px rgba(223, 189, 105, 0.6);
+        }
+
+        .container {
+            max-width: 960px;
+        }
+    </style>
+</head>
+
+<body>
+    {% include 'sponsor/header.html' %}
+
+    <!-- Title Section -->
+    <div class="title-container">
+        <div class="title">AdFusion</div>
+    </div>
+
+    <!-- Content Section -->
+    <div class="content-container">
+        <div class="container">
+            <div class="card">
+                <h2 class="card-title">Profile</h2>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <strong>Username:</strong> {{ sponsor.user.username }}
+                    </li>
+                    <li class="nav-item">
+                        <strong>Email:</strong> {{ sponsor.user.email }}
+                    </li>
+                    <li class="nav-item">
+                        <strong>Company Name:</strong> {{ sponsor.company_name }}
+                    </li>
+                    <li class="nav-item">
+                        <strong>Industry:</strong> {{ sponsor.industry }}
+                    </li>
+                    <li class="nav-item">
+                        <strong>Budget:</strong> {{ sponsor.budget }}
+                    </li>
+                    <li class="nav-item mt-3">
+                        <a href="{{ url_for('sponsor_profile', sponsor_id=sponsor.id) }}" class="btn btn-primary">Edit Profile</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="container mt-5">
+            <div class="card">
+                <h2 class="card-title text-center">Ad Request Status Distribution</h2>
+                <canvas id="ad_chart" width="400" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function fetchAdRequestStatusData() {
+            const response = await fetch('/ad_chart');
+            const data = await response.json();
+            return data;
+        }
+
+        async function renderChart() {
+            const data = await fetchAdRequestStatusData();
+            const ctx = document.getElementById('ad_chart').getContext('2d');
+            new Chart(ctx, {
+                type: 'pie',
+                data: data,
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                color: '#000000'
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Ad Request Status Distribution',
+                            color: '#000000'
+                        }
+                    }
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', renderChart);
+    </script>
+    <script>
+        window.addEventListener('DOMContentLoaded', (event) => {
+            // Handling flash messages with 'danger' category
+            let errorMessage = '{{ get_flashed_messages(category_filter=["danger"])[0] if get_flashed_messages(category_filter=["danger"]) else "" }}';
+            if (errorMessage) {
+                alert(errorMessage);
+            }
+    
+            // Handling flash messages with 'success' category
+            let successMessage = '{{ get_flashed_messages(category_filter=["success"])[0] if get_flashed_messages(category_filter=["success"]) else "" }}';
+            if (successMessage) {
+                alert(successMessage);
+            }
+
+            let profileMessage = '{{ get_flashed_messages(category_filter=["complete_profile"])[0] if get_flashed_messages(category_filter=["complete_profile"]) else "" }}';
+            if (profileMessage) {
+                alert(profileMessage);
+            }
+
+            let warningMessage = '{{ get_flashed_messages(category_filter=["warning"])[0] if get_flashed_messages(category_filter=["warning"]) else "" }}';
+                if (warningMessage) {
+                    alert(warningMessage);
+                }
+        });
+    </script>
+</body>
+
+</html>

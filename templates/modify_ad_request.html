@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Modify Ad Request - AdFusion</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #000000;
+            color: #f5f5f5;
+            font-family: 'Arial', sans-serif;
+        }
+
+        .container {
+            max-width: 600px;
+            margin-top: 50px;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #DFBD69;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .form-control {
+            background-color: #1c1c1c;
+            border: 1px solid #444;
+            color: #f5f5f5;
+            border-radius: 30px; /* Rounded corners */
+            padding: 10px 15px;
+        }
+
+        .form-control:focus {
+            background-color: #333;
+            border-color: #DFBD69;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, #DFBD69, #926F34);
+            border: none;
+            border-radius: 30px;
+            font-size: 18px;
+            font-weight: bold;
+            text-transform: uppercase;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 0 15px rgba(223, 189, 105, 0.6);
+        }
+
+        .btn-secondary {
+            color: #DFBD69;
+            text-decoration: none;
+            display: block;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .btn-secondary:hover {
+            color: #f5f5f5;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Modify Ad Request</h1>
+        <form method="POST" action="{{ url_for('modify_ad_request', request_id=ad_request.id) }}">
+            <div class="form-group">
+                <label for="messages">Messages:</label>
+                <textarea id="messages" name="messages" class="form-control" rows="3">{{ ad_request.messages }}</textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="requirements">Requirements:</label>
+                <textarea id="requirements" name="requirements" class="form-control" rows="3">{{ ad_request.requirements }}</textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="payment_amount">Payment Amount:</label>
+                <input type="number" id="payment_amount" name="payment_amount" class="form-control" value="{{ ad_request.payment_amount }}" step="0.01">
+            </div>
+
+            <button type="submit" class="btn btn-primary">Modify Request</button>
+        </form>
+
+        <a href="{{ url_for('ad_requests') }}" class="btn-secondary">Back to Ad Requests</a>
+    </div>
+    <script>
+        window.addEventListener('DOMContentLoaded', (event) => {
+            // Handling flash messages with 'danger' category
+            let errorMessage = '{{ get_flashed_messages(category_filter=["danger"])[0] if get_flashed_messages(category_filter=["danger"]) else "" }}';
+            if (errorMessage) {
+                alert(errorMessage);
+            }
+    
+            // Handling flash messages with 'success' category
+            let successMessage = '{{ get_flashed_messages(category_filter=["success"])[0] if get_flashed_messages(category_filter=["success"]) else "" }}';
+            if (successMessage) {
+                alert(successMessage);
+            }
+        });
+    </script>
+</body>
+
+</html>

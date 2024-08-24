@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard - AdFusion</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+    <style>
+        body {
+            background-color: #000000;
+            color: #f5f5f5;
+            font-family: 'Arial', sans-serif;
+        }
+
+        .container h1,
+        .container h4 {
+            color: #DFBD69;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .nav-item {
+            margin-bottom: 10px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin-top: 50px;
+        }
+
+        .profile-info {
+            background-color: #1c1c1c;
+            border: 1px solid #444;
+            border-radius: 20px;
+            padding: 40px;
+            color: #f5f5f5;
+        }
+
+        ul.nav.flex-column {
+            background-color: #1c1c1c;
+            padding: 20px;
+            border-radius: 20px;
+            border: 1px solid #444;
+        }
+
+        ul.nav.flex-column .nav-item {
+            margin-bottom: 10px;
+            color: #f5f5f5;
+        }
+    </style>
+</head>
+
+<body>
+    {% include 'admin/header.html' %}
+    <div class="container">
+        <h1>Dashboard</h1>
+        <div class="profile-info mb-4">
+            <h4>Profile</h4>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <strong>Username:</strong> {{ admin.username }}
+                </li>
+                <li class="nav-item">
+                    <strong>Email:</strong> {{ admin.email }}
+                </li>
+            </ul>
+        </div>
+    </div>
+    <script>
+        window.addEventListener('DOMContentLoaded', (event) => {
+            // Handling flash messages with 'danger' category
+            let errorMessage = '{{ get_flashed_messages(category_filter=["danger"])[0] if get_flashed_messages(category_filter=["danger"]) else "" }}';
+            if (errorMessage) {
+                alert(errorMessage);
+            }
+    
+            // Handling flash messages with 'success' category
+            let successMessage = '{{ get_flashed_messages(category_filter=["success"])[0] if get_flashed_messages(category_filter=["success"]) else "" }}';
+            if (successMessage) {
+                alert(successMessage);
+            }
+        });
+    </script>
+</body>
+
+</html>

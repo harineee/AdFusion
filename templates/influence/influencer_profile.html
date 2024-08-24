@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Influencer Profile - AdFusion</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+    <style>
+        body {
+            background-color: #000000;
+            color: #f5f5f5;
+            font-family: 'Arial', sans-serif;
+        }
+
+        .container h1, .profile-info h2 {
+            color: #DFBD69;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .form-control,
+        input[type="text"],
+        input[type="email"],
+        input[type="number"],
+        select {
+            background-color: #1c1c1c;
+            color: #f5f5f5;
+            border: 1px solid #444;
+            border-radius: 30px;
+            padding: 10px 15px;
+        }
+
+        .form-control::placeholder,
+        input[type="text"]::placeholder,
+        input[type="email"]::placeholder,
+        input[type="number"]::placeholder {
+            color: #888;
+        }
+
+        .form-control:focus,
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="number"]:focus,
+        select:focus {
+            background-color: #333;
+            border-color: #DFBD69;
+            color: #f5f5f5;
+            box-shadow: 0 0 10px #DFBD69;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, #DFBD69, #926F34);
+            border: none;
+            border-radius: 30px;
+            font-size: 18px;
+            font-weight: bold;
+            text-transform: uppercase;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 0 15px rgba(223, 189, 105, 0.6);
+        }
+
+        .profile-info {
+            background-color: #1c1c1c;
+            border: 1px solid #444;
+            border-radius: 20px;
+            padding: 40px;
+            color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 800px;
+            margin-top: 50px;
+        }
+    </style>
+</head>
+
+<body>
+    {% include 'influence/header.html' %}
+    <div class="container">
+        <h1>Influencer Profile</h1>
+        <div class="profile-info mb-4">
+            <h2>Profile Information</h2>
+            <form method="POST" action="{{ url_for('influencer_profile', influencer_id=influencer.id) }}">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" class="form-control" id="username" name="username" value="{{ user.username }}" required />
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}" required />
+                </div>
+                <div class="form-group">
+                    <label for="category">Category</label>
+                    <input type="text" class="form-control" id="category" name="category" value="{{ influencer.category }}" required />
+                </div>
+                <div class="form-group">
+                    <label for="niche">Niche</label>
+                    <select class="form-control" id="niche" name="niche" required>
+                        {% for niche in niches %}
+                        <option value="{{ niche }}" {% if niche == influencer.niche %}selected{% endif %}>{{ niche }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="budget">Follower Count</label>
+                    <input type="number" step="1" class="form-control" id="reach" name="reach" value="{{ influencer.reach }}" required />
+                </div>
+                <button type="submit" class="btn btn-primary">Update Profile</button>
+            </form>
+        </div>
+    </div>
+    <script>
+        window.addEventListener('DOMContentLoaded', (event) => {
+            // Handling flash messages with 'danger' category
+            let errorMessage = '{{ get_flashed_messages(category_filter=["danger"])[0] if get_flashed_messages(category_filter=["danger"]) else "" }}';
+            if (errorMessage) {
+                alert(errorMessage);
+            }
+    
+            // Handling flash messages with 'success' category
+            let successMessage = '{{ get_flashed_messages(category_filter=["success"])[0] if get_flashed_messages(category_filter=["success"]) else "" }}';
+            if (successMessage) {
+                alert(successMessage);
+            }
+        });
+    </script>
+</body>
+
+</html>

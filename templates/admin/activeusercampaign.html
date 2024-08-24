@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Influencer/Campaign List - AdFusion</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+    <style>
+        body {
+            background-color: #000000;
+            color: #f5f5f5;
+            font-family: 'Arial', sans-serif;
+        }
+
+        .container h1 {
+            color: #DFBD69;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .form-control,
+        select {
+            background-color: #1c1c1c;
+            color: #f5f5f5;
+            border: 1px solid #444;
+            border-radius: 30px;
+            padding: 10px 15px;
+        }
+
+        .form-control:focus,
+        select:focus {
+            background-color: #333;
+            border-color: #DFBD69;
+            color: #f5f5f5;
+            box-shadow: 0 0 10px #DFBD69;
+        }
+
+        .table {
+            background-color: #1c1c1c;
+            color: #f5f5f5;
+            border-radius: 20px;
+            border: 1px solid #444;
+        }
+
+        .table th {
+            color: #DFBD69;
+            font-weight: bold;
+        }
+
+        .table td {
+            color: #f5f5f5;
+        }
+
+        .btn-danger {
+            background: linear-gradient(90deg, #DFBD69, #926F34);
+            border: none;
+            border-radius: 30px;
+            font-size: 18px;
+            font-weight: bold;
+            text-transform: uppercase;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            margin-right: 10px;
+            color: #000;
+        }
+
+        .btn-danger:hover {
+            box-shadow: 0 0 15px rgba(223, 189, 105, 0.6);
+        }
+    </style>
+</head>
+
+<body>
+    {% include 'admin/header.html' %}
+    <div class="container mt-5">
+        <h1>Select Influencers or Campaigns</h1>
+        <div class="mb-3">
+            <form method="GET" action="{{ url_for('view_entities') }}">
+                <select name="view" onchange="this.form.submit()" class="form-control">
+                    <option value="influencers" {% if view == 'influencers' %}selected{% endif %}>Influencers</option>
+                    <option value="campaigns" {% if view == 'campaigns' %}selected{% endif %}>Campaigns</option>
+                </select>
+            </form>
+        </div>
+        <table class="table">
+            <thead>
+                <tr>
+                    {% if view == 'influencers' %}
+                    <th>Name</th>
+                    <th>Category</th>
+                    <th>Niche</th>
+                    <th>Reach</th>
+                    <th>Actions</th>
+                    {% elif view == 'campaigns' %}
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                    <th>Budget</th>
+                    <th>Actions</th>
+                    {% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% if view == 'influencers' %}
+                    {% for influencer in influencers %}
+                    <tr>
+                        <td>{{ influencer.user.username }}</td>
+                        <td>{{ influencer.category }}</td>
+                        <td>{{ influencer.niche }}</td>
+                        <td>{{ influencer.reach }}</td>
+                        <td>
+                            <a href="{{ url_for('flag_influencer', influencer_id=influencer.id) }}" class="btn btn-danger">Flag</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% elif view == 'campaigns' %}
+                    {% for campaign in campaigns %}
+                    <tr>
+                        <td>{{ campaign.name }}</td>
+                        <td>{{ campaign.description }}</td>
+                        <td>{{ campaign.start_date }}</td>
+                        <td>{{ campaign.end_date }}</td>
+                        <td>{{ campaign.budget }}</td>
+                        <td>
+                            <a href="{{ url_for('flag_campaign', campaign_id=campaign.id) }}" class="btn btn-danger">Flag</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+    <script>
+        window.addEventListener('DOMContentLoaded', (event) => {
+            // Handling flash messages with 'danger' category
+            let errorMessage = '{{ get_flashed_messages(category_filter=["danger"])[0] if get_flashed_messages(category_filter=["danger"]) else "" }}';
+            if (errorMessage) {
+                alert(errorMessage);
+            }
+    
+            // Handling flash messages with 'success' category
+            let successMessage = '{{ get_flashed_messages(category_filter=["success"])[0] if get_flashed_messages(category_filter=["success"]) else "" }}';
+            if (successMessage) {
+                alert(successMessage);
+            }
+        });
+    </script>
+</body>
+
+</html>

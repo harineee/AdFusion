@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>View Ad Requests - AdFusion</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #000000;
+            color: #DFBD69;
+            font-family: 'Arial', sans-serif;
+        }
+        h1, h2 {
+            color: #DFBD69;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .container {
+            max-width: 800px;
+            margin-top: 50px;
+            color: #DFBD69; /* Ensures all text in the container is gold */
+        }
+        .table {
+            background-color: #1c1c1c;
+            color: #DFBD69;
+            border: 1px solid #444;
+        }
+        .table th {
+            color: #DFBD69;
+        }
+        .table td {
+            color: #DFBD69; /* Ensures all table cell text is gold */
+        }
+        .btn-primary,
+        .btn-success,
+        .btn-danger,
+        .btn-warning {
+            background: linear-gradient(90deg, #DFBD69, #926F34);
+            border: none;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #000; /* Text on buttons is black for contrast */
+        }
+    </style>
+</head>
+<body>
+    {% include 'sponsor/header.html' %}
+    <div class="container">
+        <h1>Ad Requests for Campaign: {{ campaign.name }}</h1>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Request ID</th>
+                    <th>Sender</th>
+                    <th>Receiver</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for request in ad_requests %}
+                <tr>
+                    <td>{{ request.id }}</td>
+                    <td>{{ request.sender.username }}</td>
+                    <td>{{ request.receiver.username }}</td>
+                    <td>{{ request.status }}</td>
+                    <td>
+                        {% if request.status == 'pending' %}
+                        <form action="{{ url_for('accept_ad_request', request_id=request.id) }}" method="POST" style="display:inline-block;">
+                            <button type="submit" class="btn btn-success">Accept</button>
+                        </form>
+                        <form action="{{ url_for('reject_ad_request', request_id=request.id) }}" method="POST" style="display:inline-block;">
+                            <button type="submit" class="btn btn-danger">Reject</button>
+                        </form>
+                        {% endif %}
+                        <a href="{{ url_for('modify_ad_request', request_id=request.id) }}" class="btn btn-warning">Modify</a>
+                        <form action="{{ url_for('delete_ad_request', request_id=request.id) }}" method="POST" style="display:inline-block;">
+                            <button type="submit" class="btn btn-danger">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <script>
+        window.addEventListener('DOMContentLoaded', (event) => {
+            // Handling flash messages with 'danger' category
+            let errorMessage = '{{ get_flashed_messages(category_filter=["danger"])[0] if get_flashed_messages(category_filter=["danger"]) else "" }}';
+            if (errorMessage) {
+                alert(errorMessage);
+            }
+    
+            // Handling flash messages with 'success' category
+            let successMessage = '{{ get_flashed_messages(category_filter=["success"])[0] if get_flashed_messages(category_filter=["success"]) else "" }}';
+            if (successMessage) {
+                alert(successMessage);
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}AdFusion{% endblock %}</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #000000;
+            color: #f5f5f5;
+        }
+
+        .navbar {
+            background-color: #000000; /* Black background for the navbar */
+            padding: 10px 0; /* Adjusted padding for a cleaner look */
+        }
+
+        .navbar .navbar-nav .nav-link {
+            color: #DFBD69; /* Gold color for links */
+            font-weight: bold;
+            text-transform: uppercase; /* Capitalize the text */
+            letter-spacing: 1px; /* Slightly reduced letter spacing */
+            font-size: 16px; /* Reduced font size */
+            padding: 0 15px; /* Reduced padding to match the new header size */
+        }
+
+        .navbar .navbar-nav .nav-link:hover {
+            color: #f5f5f5; /* White color on hover */
+        }
+
+        .navbar-toggler-icon {
+            filter: invert(1); /* Makes the toggle icon white */
+        }
+
+        .nav-item {
+            margin-right: 15px; /* Slightly reduced margin between nav items */
+        }
+
+        .container {
+            max-width: 960px;
+            margin-top: 40px;
+            color: #f5f5f5; /* Ensure container text is white */
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('spon_dash') }}">Dashboard</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('manage_campaigns') }}">Manage Campaigns</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('list_influencers', sort_by='desc') }}">Search for Influencers</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('ad_requests') }}">Ad Requests</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('sponsor_payments') }}">Payments</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <div class="container mt-4">
+        {% block content %}{% endblock %}
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        window.addEventListener('DOMContentLoaded', (event) => {
+            // Handling flash messages with 'danger' category
+            let errorMessage = '{{ get_flashed_messages(category_filter=["danger"])[0] if get_flashed_messages(category_filter=["danger"]) else "" }}';
+            if (errorMessage) {
+                alert(errorMessage);
+            }
+    
+            // Handling flash messages with 'success' category
+            let successMessage = '{{ get_flashed_messages(category_filter=["success"])[0] if get_flashed_messages(category_filter=["success"]) else "" }}';
+            if (successMessage) {
+                alert(successMessage);
+            }
+        });
+    </script>
+</body>
+
+</html>

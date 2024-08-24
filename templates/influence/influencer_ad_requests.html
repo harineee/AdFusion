@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Ad Requests - AdFusion</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #000000;
+            color: #000000;
+            font-family: 'Arial', sans-serif;
+        }
+
+        .container h1, .container h2 {
+            color: #DFBD69;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background-color: #1c1c1c;
+            border: 1px solid #DFBD69;
+            border-radius: 20px;
+            box-shadow: 0 0 20px rgba(223, 189, 105, 0.3);
+            margin-bottom: 20px;
+            padding: 20px;
+            color: #000000;
+        }
+
+        .card-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #DFBD69;
+            margin-bottom: 10px;
+        }
+
+        .card-text {
+            color: #000000;
+            margin-bottom: 5px;
+        }
+
+        .btn-danger, .btn-warning, .btn-success {
+            background: linear-gradient(90deg, #DFBD69, #926F34);
+            border: none;
+            border-radius: 30px;
+            font-size: 18px;
+            font-weight: bold;
+            text-transform: uppercase;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            margin-right: 10px;
+            color: #000;
+        }
+
+        .btn-danger:hover, .btn-warning:hover, .btn-success:hover {
+            box-shadow: 0 0 15px rgba(223, 189, 105, 0.6);
+        }
+    </style>
+</head>
+
+<body>
+    {% include 'influence/header.html' %}
+    <div class="container mt-5">
+        <h1>Ad Requests</h1>
+        {% for ad_request in ad_requests %}
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Campaign: {{ ad_request.campaign.name }}</h5>
+                <p class="card-text">Influencer: {{ ad_request.influencer.user.username }}</p>
+                <p class="card-text">Messages: {{ ad_request.messages }}</p>
+                <p class="card-text">Requirements: {{ ad_request.requirements }}</p>
+                <p class="card-text">Payment Amount: {{ ad_request.payment_amount }}</p>
+                <p class="card-text">Status: {{ ad_request.status | capitalize }}</p>
+
+                {% if ad_request.status == 'pending' %}
+                    {% if ad_request.sender_id == session['user_id'] %}
+                        <!-- If the current user is the sender -->
+                        <form action="{{ url_for('delete_ad_request', request_id=ad_request.id) }}" method="post" class="d-inline">
+                            <button type="submit" class="btn btn-danger">Delete</button>
+                        </form>
+                        <a href="{{ url_for('modify_ad_request', request_id=ad_request.id) }}" class="btn btn-warning">Modify</a>
+                    {% else %}
+                        <!-- If the current user is the receiver -->
+                        <a href="{{ url_for('modify_ad_request', request_id=ad_request.id) }}" class="btn btn-warning">Modify</a>
+                        {% if ad_request.latest_sender != session['user_id'] %}
+                        <form action="{{ url_for('accept_ad_request', request_id=ad_request.id) }}" method="post" class="d-inline">
+                            <button type="submit" class="btn btn-success">Accept</button>
+                        </form>
+                        <form action="{{ url_for('reject_ad_request', request_id=ad_request.id) }}" method="post" class="d-inline">
+                            <button type="submit" class="btn btn-danger">Reject</button>
+                        </form>
+                        {% endif %}
+                    {% endif %}
+                {% elif ad_request.status in ['accepted', 'rejected'] %}
+                    <!-- Display status only if accepted or rejected -->
+                    <p class="card-text">{{ ad_request.status | capitalize }}</p>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+
+        <h2>Expired Requests</h2>
+        {% for ad_request in expired %}
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Campaign: {{ ad_request.campaign.name }}</h5>
+                <p class="card-text">Messages: {{ ad_request.messages }}</p>
+                <p class="card-text">Requirements: {{ ad_request.requirements }}</p>
+                <p class="card-text">Payment Amount: {{ ad_request.payment_amount }}</p>
+                <p class="card-text">Status: {{ ad_request.status | capitalize }}</p>
+                <p class="card-text"><strong>Campaign Ended On:</strong> {{ ad_request.campaign.end_date }}</p>
+            </div>
+        </div>
+        {% endfor %}
+
+        <h2>Flagged Campaign Requests</h2>
+        {% for ad_request in flagged %}
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Campaign: {{ ad_request.campaign.name }}</h5>
+                <p class="card-text">Messages: {{ ad_request.messages }}</p>
+                <p class="card-text">Requirements: {{ ad_request.requirements }}</p>
+                <p class="card-text">Payment Amount: {{ ad_request.payment_amount }}</p>
+                <p class="card-text">Status: {{ ad_request.status | capitalize }}</p>
+                <p class="card-text text-danger">Flagged</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <script>
+        window.addEventListener('DOMContentLoaded', (event) => {
+            // Handling flash messages with 'danger' category
+            let errorMessage = '{{ get_flashed_messages(category_filter=["danger"])[0] if get_flashed_messages(category_filter=["danger"]) else "" }}';
+            if (errorMessage) {
+                alert(errorMessage);
+            }
+    
+            // Handling flash messages with 'success' category
+            let successMessage = '{{ get_flashed_messages(category_filter=["success"])[0] if get_flashed_messages(category_filter=["success"]) else "" }}';
+            if (successMessage) {
+                alert(successMessage);
+            }
+        });
+    </script>
+</body>
+
+</html>

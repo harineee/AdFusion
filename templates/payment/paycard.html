@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Complete Payment - AdFusion</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+    <script src="https://js.stripe.com/v3/"></script>
+    <style>
+        body {
+            background-color: #000000;
+            color: #f5f5f5;
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        h1 {
+            color: #DFBD69;
+        }
+
+        p {
+            color: #f5f5f5;
+        }
+
+        .form-control, 
+        input[type="text"], 
+        input[type="email"], 
+        input[type="number"], 
+        input[type="password"], 
+        textarea, 
+        select {
+            background-color: #1c1c1c;  /* Dark background */
+            color: #f5f5f5;  /* Light text color */
+            border: 1px solid #444;  /* Dark border */
+            border-radius: 30px;  /* Rounded corners */
+            padding: 10px 15px;
+        }
+
+        .form-control::placeholder, 
+        input[type="text"]::placeholder, 
+        input[type="email"]::placeholder, 
+        input[type="number"]::placeholder, 
+        input[type="password"]::placeholder, 
+        textarea::placeholder {
+            color: #888;  /* Lighter color for placeholder text */
+        }
+
+        /* Focus state */
+        .form-control:focus, 
+        input[type="text"]:focus, 
+        input[type="email"]:focus, 
+        input[type="number"]:focus, 
+        input[type="password"]:focus, 
+        textarea:focus, 
+        select:focus {
+            background-color: #333;  /* Slightly lighter background on focus */
+            border-color: #DFBD69;  /* Gold border on focus */
+            color: #f5f5f5;  /* Ensure text remains light */
+            box-shadow: 0 0 10px #DFBD69;  /* Gold glow on focus */
+        }
+
+        #card-element {
+            background-color: #1c1c1c;  /* Dark background */
+            color: #f5f5f5;  /* Light text color */
+            border: 1px solid #444;  /* Dark border */
+            border-radius: 30px;  /* Rounded corners */
+            padding: 10px 15px;
+            margin-bottom: 20px;
+        }
+
+        #submit {
+            background: linear-gradient(90deg, #DFBD69, #926F34);
+            border: none;
+            border-radius: 30px;
+            font-size: 18px;
+            font-weight: bold;
+            text-transform: uppercase;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            padding: 10px 20px;
+            color: #000;
+            cursor: pointer;
+        }
+
+        #submit:hover {
+            box-shadow: 0 0 15px rgba(223, 189, 105, 0.6);
+        }
+
+        #error-message {
+            color: #FF6347;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Complete Payment</h1>
+    <p>Campaign ID: {{ pay_info.campaign_id }}</p>
+    <p>Influencer ID: {{ pay_info.influencer_id }}</p>
+    <p>Amount: ${{ pay_info.amount }}</p>
+    <p>Status: {{ pay_info.status }}</p>
+
+    <form id="payment-form" method="POST">
+        <div id="card-element"></div>
+        <button id="submit">Pay</button>
+        <div id="error-message"></div>
+    </form>
+
+    <script>
+        var stripe = Stripe('pk_test_51Oot5iSJwEJZXRKmTNtNCrJAdkp6DWPndeYsMwC8W963TVsKqGWNMhh26BBE1WWXGtVtfw3iy9QK3OEgfjtkJoGS00e5f0Jb2M');
+        var elements = stripe.elements();
+
+        var style = {
+            base: {
+                fontSize: '16px',
+                color: '#ccc',
+            },
+        };
+
+        var card = elements.create('card', { style: style });
+        card.mount('#card-element');
+
+        card.on('change', function (event) {
+            var displayError = document.getElementById('card-errors');
+            if (event.error) {
+                displayError.textContent = event.error.message;
+            } else {
+                displayError.textContent = '';
+            }
+        });
+
+        var form = document.getElementById('payment-form');
+        form.addEventListener('submit', function (event) {
+            event.preventDefault();
+            stripe
+                .createPaymentMethod({
+                    type: 'card',
+                    card: card,
+                })
+                .then(function (result) {
+                    if (result.error) {
+                        var errorElement = document.getElementById('card-errors');
+                        errorElement.textContent = result.error.message;
+                    } else {
+                        stripeConfirmPayment(result.paymentMethod.id);
+                    }
+                });
+        });
+
+        function stripeConfirmPayment(paymentMethodId) {
+            fetch('/pay_payment/{{ pay_info.id }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ payment_method_id: paymentMethodId }),
+            })
+                .then(function (result) {
+                    return result.json();
+                })
+                .then(function (data) {
+                    handleServerResponse(data);
+                });
+        }
+
+        function handleServerResponse(response) {
+            if (response.error) {
+                var errorElement = document.getElementById('card-errors');
+                errorElement.textContent = response.error;
+            } else {
+                alert('Payment successful!');
+                setTimeout(function () {
+                    window.location.href = '/payment_success';
+                }, 1000);
+            }
+        }
+    </script>
+    <script>
+        window.addEventListener('DOMContentLoaded', (event) => {
+            // Handling flash messages with 'danger' category
+            let errorMessage = '{{ get_flashed_messages(category_filter=["danger"])[0] if get_flashed_messages(category_filter=["danger"]) else "" }}';
+            if (errorMessage) {
+                alert(errorMessage);
+            }
+    
+            // Handling flash messages with 'success' category
+            let successMessage = '{{ get_flashed_messages(category_filter=["success"])[0] if get_flashed_messages(category_filter=["success"]) else "" }}';
+            if (successMessage) {
+                alert(successMessage);
+            }
+        });
+    </script>
+</body>
+
+</html>

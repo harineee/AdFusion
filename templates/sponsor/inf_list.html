@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Influencer List - AdFusion</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+    <style>
+        body {
+    background-color: #000000;
+    color: #DFBD69; /* Set text color to gold */
+    font-family: 'Arial', sans-serif;
+}
+
+.container h1 {
+    color: #DFBD69; /* Gold text */
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.form-control {
+    background-color: #1c1c1c;
+    border: 1px solid #444;
+    color: #DFBD69; /* Gold text */
+    border-radius: 30px; /* Rounded corners */
+    padding: 10px 15px;
+}
+
+.form-control:focus {
+    background-color: #333;
+    border-color: #DFBD69;
+    color: #DFBD69; /* Gold text */
+}
+
+.table {
+    background-color: #1c1c1c;
+    border: 1px solid #444;
+    color: #DFBD69; /* Gold text for entire table */
+}
+
+.table th {
+    color: #DFBD69; /* Gold text for table headers */
+}
+
+.table td {
+    color: #DFBD69; /* Gold text for table data cells */
+}
+
+.btn-primary {
+    background: linear-gradient(90deg, #DFBD69, #926F34);
+    border: none;
+    border-radius: 30px;
+    font-size: 18px;
+    font-weight: bold;
+    text-transform: uppercase;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    color: #000000; /* Black text on buttons */
+}
+
+.btn-primary:hover {
+    box-shadow: 0 0 15px rgba(223, 189, 105, 0.6);
+}
+
+.container {
+    max-width: 1000px;
+    margin-top: 50px;
+}
+
+/* Set text color for form labels and other elements */
+.form-group label {
+    color: #DFBD69; /* Gold text */
+}
+
+.btn-info {
+    background-color: #DFBD69;
+    border-color: #DFBD69;
+    color: #000000; /* Black text on buttons */
+}
+
+.btn-info:hover {
+    background-color: #926F34;
+    border-color: #926F34;
+}
+
+    </style>
+</head>
+
+<body>
+    {% include 'sponsor/header.html' %}
+    <div class="container">
+        <h1>Influencer List</h1>
+        <div class="mb-3">
+            <form method="GET" action="{{ url_for('list_influencers') }}">
+                <div class="form-group">
+                    <label for="search">Search</label>
+                    <input type="text" class="form-control" id="search" name="search" value="{{ search_term }}" placeholder="Search by name, category, or niche">
+                </div>
+                <div class="form-group">
+                    <label for="niche">Filter by Niche</label>
+                    <select class="form-control" id="niche" name="niche" onchange="this.form.submit()">
+                        <option value="all">All Niches</option>
+                        {% for niche in niches %}
+                        <option value="{{ niche }}" {% if niche == selected_niche %}selected{% endif %}>{{ niche }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <input type="hidden" name="sort_by" value="{{ sort_by }}">
+                <button type="submit" class="btn btn-primary">Search</button>
+            </form>
+        </div>
+
+        <div class="mb-3">
+            <a href="{{ url_for('list_influencers', sort_by='asc', niche=selected_niche, search=search_term) }}" class="btn btn-primary">Sort by Reach (Ascending)</a>
+            <a href="{{ url_for('list_influencers', sort_by='desc', niche=selected_niche, search=search_term) }}" class="btn btn-primary">Sort by Reach (Descending)</a>
+        </div>
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Category</th>
+                    <th>Niche</th>
+                    <th>Reach</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for influencer in influencers %}
+                <tr>
+                    <td>{{ influencer.user.username }}</td>
+                    <td>{{ influencer.category }}</td>
+                    <td>{{ influencer.niche }}</td>
+                    <td>{{ influencer.reach }}</td>
+                    <td>
+                        <a href="{{ url_for('request_ad', influencer_id=influencer.id) }}" class="btn btn-info">Request</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <script>
+        window.addEventListener('DOMContentLoaded', (event) => {
+            // Handling flash messages with 'danger' category
+            let errorMessage = '{{ get_flashed_messages(category_filter=["danger"])[0] if get_flashed_messages(category_filter=["danger"]) else "" }}';
+            if (errorMessage) {
+                alert(errorMessage);
+            }
+    
+            // Handling flash messages with 'success' category
+            let successMessage = '{{ get_flashed_messages(category_filter=["success"])[0] if get_flashed_messages(category_filter=["success"]) else "" }}';
+            if (successMessage) {
+                alert(successMessage);
+            }
+        });
+    </script>
+</body>
+
+</html>

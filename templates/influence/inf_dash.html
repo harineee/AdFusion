@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard - AdFusion</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+    <style>
+        body {
+            background-color: #000000;
+            color: #f5f5f5;
+            font-family: 'Arial', sans-serif;
+        }
+
+        h1, h4 {
+            color: #DFBD69;
+            text-align: center;
+        }
+
+        .nav-item {
+            margin-bottom: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, #DFBD69, #926F34);
+            border: none;
+            border-radius: 30px;
+            font-size: 18px;
+            font-weight: bold;
+            text-transform: uppercase;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            color: #000;
+            padding: 10px 20px;
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 0 15px rgba(223, 189, 105, 0.6);
+        }
+
+        .container {
+            max-width: 1000px;
+            margin-top: 30px;
+        }
+
+        canvas {
+            background-color: #1c1c1c;
+            padding: 20px;
+            border-radius: 20px;
+        }
+
+        .mt-4, .mt-5 {
+            color: #f5f5f5;
+        }
+
+        ul.nav.flex-column {
+            background-color: #1c1c1c;
+            padding: 20px;
+            border-radius: 20px;
+            border: 1px solid #444;
+        }
+
+        ul.nav.flex-column .nav-item {
+            margin-bottom: 10px;
+            color: #f5f5f5;
+        }
+    </style>
+</head>
+
+<body>
+    {% include 'influence/header.html' %}
+    <div class="container">
+        <h1>Dashboard</h1>
+        <div class="mt-5">
+            <h4>Profile</h4>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <strong>Username:</strong> {{ influencer.user.username }}
+                </li>
+                <li class="nav-item">
+                    <strong>Email:</strong> {{ influencer.user.email }}
+                </li>
+                <li class="nav-item">
+                    <strong>Category:</strong> {{ influencer.category }}
+                </li>
+                <li class="nav-item">
+                    <strong>Niche:</strong> {{ influencer.niche }}
+                </li>
+                <li class="nav-item">
+                    <strong>Follower Count:</strong> {{ influencer.reach }}
+                </li>
+                <li class="nav-item mt-3">
+                    <a href="{{ url_for('influencer_profile', influencer_id=influencer.id) }}" class="btn btn-primary">Edit Profile</a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="container mt-5">
+            <h1>Ad Request Status Distribution</h1>
+            <canvas id="ad_chart" width="400" height="200"></canvas>
+        </div>
+
+        <!-- Include Chart.js from a CDN -->
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+        <script>
+            async function fetchAdRequestStatusData() {
+                const response = await fetch('/ad_chart');
+                const data = await response.json();
+                return data;
+            }
+
+            async function renderChart() {
+                const data = await fetchAdRequestStatusData();
+                const ctx = document.getElementById('ad_chart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'pie',
+                    data: data,
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                            },
+                            title: {
+                                display: true,
+                                text: 'Ad Request Status Distribution'
+                            }
+                        }
+                    }
+                });
+            }
+
+            document.addEventListener('DOMContentLoaded', renderChart);
+        </script>
+
+        {% if flagged_info %}
+        <div class="mt-4">
+            <h4>Flagging Details</h4>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <strong>Reason:</strong> {{ flagged_info.reason }}
+                </li>
+                <li class="nav-item">
+                    <strong>Flagged Date:</strong> {{ flagged_info.flagged_date.strftime('%Y-%m-%d %H:%M:%S') }}
+                </li>
+            </ul>
+        </div>
+        {% endif %}
+    </div>
+    <script>
+        window.addEventListener('DOMContentLoaded', (event) => {
+            // Handling flash messages with 'danger' category
+            let errorMessage = '{{ get_flashed_messages(category_filter=["danger"])[0] if get_flashed_messages(category_filter=["danger"]) else "" }}';
+            if (errorMessage) {
+                alert(errorMessage);
+            }
+    
+            // Handling flash messages with 'success' category
+            let successMessage = '{{ get_flashed_messages(category_filter=["success"])[0] if get_flashed_messages(category_filter=["success"]) else "" }}';
+            if (successMessage) {
+                alert(successMessage);
+            }
+
+            let profileMessage = '{{ get_flashed_messages(category_filter=["complete_profile"])[0] if get_flashed_messages(category_filter=["complete_profile"]) else "" }}';
+            if (profileMessage) {
+                alert(profileMessage);
+            }
+            
+            let flaggedeMessage = '{{ get_flashed_messages(category_filter=["influencer_flagged"])[0] if get_flashed_messages(category_filter=["influencer_flagged"]) else "" }}';
+            if (flaggedeMessage) {
+                alert(flaggedeMessage);
+            }
+
+            let warningMessage = '{{ get_flashed_messages(category_filter=["warning"])[0] if get_flashed_messages(category_filter=["warning"]) else "" }}';
+                if (warningMessage) {
+                    alert(warningMessage);
+                }
+
+
+
+        });
+    </script>
+</body>
+
+</html>
